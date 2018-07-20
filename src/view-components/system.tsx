@@ -1,170 +1,261 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
 import { Tooltip } from 'react-tippy';
-import { Point } from '../data/point';
-import { observable } from "mobx";
-import { System } from '../data/system';
-import { PointView } from "./point";
-import Slider from "rc-slider";
-
+import { observable, computed } from 'mobx';
+import { data } from '../data/data';
+import { PointView } from './point';
+import { points } from '../literature/points';
+import Slider from 'rc-slider';
+import { image } from '../data/sample.img';
+import { systems } from '../data/data';
 
 @observer
-export class SystemView extends React.Component<{ system: System; imgSource: string }> {
-    div: HTMLDivElement | null = null;
+export class SystemView extends React.Component {
+	div: HTMLDivElement | null = null;
+	@observable invert: number = 0;
+	@observable contrast: number = 100;
+	@observable brightness: number = 100;
 
-    @observable invert: number = 0;
-    @observable contrast: number = 100;
-    @observable brightness: number = 100;
+	@observable hovered: string = '';
 
-    render() {
-        return (
-            <main>
-                <div>
-                    {this.props.system.nextToBeAddIndex !== -1 ? (
-                        <p className="top-hint">
-                            Next: add point{' '}
-                            <span>{this.props.system.points[this.props.system.nextToBeAddIndex].id}</span>,{' '}
-                            {this.props.system.points[this.props.system.nextToBeAddIndex].description}
-                        </p>
-                    ) : (
-                            <div className="results">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Angle</th>
-                                            <th>Normal range</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {this.props.system.angles.map((angle) => {
-                                            return (
-                                                <tr key={angle.description}>
-                                                    <td>{angle.description}</td>
-                                                    <td>
-                                                        {angle.normal}±{angle.deviation}
-                                                    </td>
-                                                    <td>{angle.value}</td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                </div>
-                <div
-                    className="container"
-                    onDragOver={(e) => {
-                        e.preventDefault();
-                    }}
-                    ref={(d) => {
-                        this.div = d;
-                    }}
-                    style={{
-                        filter: `invert(${this.invert}%) contrast(${this.contrast}%) brightness(${this.brightness}%)`,
-                        width: '700px',
-                        height: '700px',
-                        position: 'relative',
-                        backgroundImage: `url(${this.props.imgSource})`,
-                        backgroundSize: 'cover'
-                    }}
-                    onClick={(e) => {
-                        if (!this.div) return;
-                        if (this.props.system.nextToBeAddIndex === -1) return;
-                        const left = (e.pageX - this.div.offsetLeft - 5) / 700 * 100;
-                        const top = (e.pageY - this.div.offsetTop - 5) / 700 * 100;
-                        this.props.system.points[this.props.system.nextToBeAddIndex].top = top;
-                        this.props.system.points[this.props.system.nextToBeAddIndex].left = left;
-                    }}
-                >
-                    <div className="points">
-                        {this.props.system.points.filter((x) => x.added).map((point) => (
-                            <PointView
-                                key={point.id}
-                                point={point}
-                                onDragged={(ev) => {
-                                    if (!this.div) return;
-                                    this.props.system.updatePointOnDrop(point, this.div, ev);
-                                }}
-                            />
-                        ))}
-                    </div>
-                    <div className="lines">
-                        {this.props.system.lines.filter((x) => x.values).map((line) => (
-                            <Tooltip key={line.id} title={'Line ' + line.id + '  ' + line.description} theme="light">
-                                <div
-                                    style={
-                                        line.values(this.props.system) ? (
-                                            {
-                                                padding: 0,
-                                                margin: 0,
-                                                height: 3 + 'px',
-                                                backgroundColor: 'red',
-                                                lineHeight: '1px',
-                                                position: 'absolute',
-                                                left: (line.values(this.props.system) || { left: 0 }).left + 'px',
-                                                top: (line.values(this.props.system) || { top: 0 }).top + 'px',
-                                                width:
-                                                    (line.values(this.props.system) || { distance: 0 }).distance +
-                                                    'px',
-                                                transform:
-                                                    'rotate(' +
-                                                    (line.values(this.props.system) || { angle: 0 }).angle +
-                                                    'deg)'
-                                            }
-                                        ) : (
-                                                {}
-                                            )
-                                    }
-                                />
-                            </Tooltip>
-                        ))}
-                    </div>
-                </div>
-                <div className="controls" style={{ width: '700px', margin: '0 auto' }}>
-                    <div style={{ width: '33.333%', float: 'left', textAlign: 'center' }}>
-                        <p style={{ color: '#f44336' }}>Invert</p>
-                        <Slider
-                            handleStyle={{ borderColor: '#f44336' }}
-                            trackStyle={{ backgroundColor: '#f44336' }}
-                            min={0}
-                            max={100}
-                            value={this.invert}
-                            onChange={(n: number) => {
-                                this.invert = n;
-                            }}
-                        />
-                    </div>
+	@observable showControl: string = '';
 
-                    <div style={{ width: '33.333%', float: 'left', textAlign: 'center' }}>
-                        <p style={{ color: '#673ab7' }}>Contrast</p>
-                        <Slider
-                            handleStyle={{ borderColor: '#673ab7' }}
-                            trackStyle={{ backgroundColor: '#673ab7' }}
-                            min={0}
-                            max={500}
-                            value={this.contrast}
-                            onChange={(n: number) => {
-                                this.contrast = n;
-                            }}
-                        />
-                    </div>
-                    <div style={{ width: '33.333%', float: 'left', textAlign: 'center' }}>
-                        <p style={{ color: '#ff9800' }}>Brightness</p>
-                        <Slider
-                            handleStyle={{ borderColor: '#ff9800' }}
-                            trackStyle={{ backgroundColor: '#ff9800' }}
-                            min={0}
-                            max={200}
-                            value={this.brightness}
-                            onChange={(n: number) => {
-                                this.brightness = n;
-                            }}
-                        />
-                    </div>
-                </div>
-            </main>
-        );
-    }
+	@observable showResults: boolean = false;
+
+	@computed
+	get stepDimension() {
+		return (data.innerHeight - data.system.points.length * 24) / data.system.points.length;
+	}
+
+	render() {
+		return (
+			<main>
+				<div
+					className="container"
+					onDragOver={(e) => {
+						e.preventDefault();
+					}}
+					ref={(d) => {
+						this.div = d;
+					}}
+					style={{
+						width: data.dimensions.width + 'px',
+						height: data.dimensions.height + 'px',
+						position: 'relative'
+					}}
+				>
+					<img
+						src={image}
+						style={{
+							width: data.dimensions.width,
+							height: data.dimensions.height,
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							filter: `invert(${this.invert}%) contrast(${this.contrast}%) brightness(${this
+								.brightness}%)`
+						}}
+						onClick={(e) => {
+							if (!this.div) {
+								return;
+							}
+							if (data.nextPointIndex === -1 || data.nextPointID === undefined) {
+								return;
+							}
+							const left = (e.pageX - this.div.offsetLeft - 5) / data.dimensions.width * 100;
+							const top = (e.pageY - this.div.offsetTop - 5) / data.dimensions.height * 100;
+
+							data.pointCoordinates[data.nextPointID] = {
+								top,
+								left
+							};
+						}}
+					/>
+					<div className="points">
+						{Object.keys(data.pointCoordinates).map((id) => (
+							<PointView
+								key={id}
+								onDragged={(ev) => {
+									if (!this.div) {
+										return;
+									}
+									data.updatePointOnDrop(id, this.div, ev);
+								}}
+								description={points[id]}
+								id={id}
+								top={(data.pointCoordinates[id] || { top: 0 }).top}
+								left={(data.pointCoordinates[id] || { left: 0 }).left}
+							/>
+						))}
+					</div>
+					<div className="lines">
+						{data.lines.map((line) => (
+							<Tooltip key={line.id} title={'Line ' + line.id + '  ' + line.description} theme="light">
+								<div
+									style={{
+										padding: 0,
+										margin: 0,
+										height: 1 + 'px',
+										backgroundColor: '#212121',
+										lineHeight: '1px',
+										position: 'absolute',
+										left: line.left + 'px',
+										top: line.top + 'px',
+										width: line.distance + 'px',
+										transform: 'rotate(' + line.angle + 'deg)'
+									}}
+								/>
+							</Tooltip>
+						))}
+					</div>
+					<div className="steps">
+						{data.system.points.map((pointID) => (
+							<div
+								style={{
+									height: this.stepDimension + 'px',
+									width: this.stepDimension + 'px',
+									lineHeight: this.stepDimension + 'px'
+								}}
+								className={`step ${data.pointCoordinates[pointID]
+									? ' done'
+									: data.nextPointID === pointID ? ' current' : ''} ${this.hovered === pointID
+									? 'hovered'
+									: ''}`}
+								key={pointID}
+								onMouseEnter={() => (this.hovered = pointID)}
+								onMouseLeave={() => (this.hovered = '')}
+							>
+								<span className="id">{pointID}</span>
+								<span className="description" style={{ right: this.stepDimension + 20 + 'px' }}>
+									{points[pointID]}
+								</span>
+							</div>
+						))}
+					</div>
+
+					<div className="controls">
+						<div className="control-button">
+							<span
+								className="control-symbol"
+								onClick={() =>
+									(this.showControl = this.showControl === 'brightness' ? '' : 'brightness')}
+							>
+								☀
+							</span>
+							<div
+								className="control-range"
+								style={{ display: this.showControl === 'brightness' ? 'block' : '' }}
+							>
+								<Slider
+									handleStyle={{ borderColor: '#000' }}
+									trackStyle={{ backgroundColor: '#e3e3e3' }}
+									min={0}
+									max={200}
+									value={this.brightness}
+									onChange={(n: number) => {
+										this.brightness = n;
+									}}
+								/>
+							</div>
+						</div>
+						<div className="control-button">
+							<span
+								className="control-symbol"
+								onClick={() => (this.showControl = this.showControl === 'contrast' ? '' : 'contrast')}
+							>
+								◐
+							</span>
+							<div
+								className="control-range"
+								style={{ display: this.showControl === 'contrast' ? 'block' : '' }}
+							>
+								<Slider
+									handleStyle={{ borderColor: '#000' }}
+									trackStyle={{ backgroundColor: '#e3e3e3' }}
+									min={0}
+									max={500}
+									value={this.contrast}
+									onChange={(n: number) => {
+										this.contrast = n;
+									}}
+								/>
+							</div>
+						</div>
+						<div className="control-button">
+							<span
+								className="control-symbol"
+								onClick={() => (this.showControl = this.showControl === 'invert' ? '' : 'invert')}
+							>
+								℧
+							</span>
+							<div
+								className="control-range"
+								style={{ display: this.showControl === 'invert' ? 'block' : '' }}
+							>
+								<Slider
+									handleStyle={{ borderColor: '#000' }}
+									trackStyle={{ backgroundColor: '#e3e3e3' }}
+									min={0}
+									max={100}
+									value={this.invert}
+									onChange={(n: number) => {
+										this.invert = n;
+									}}
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div className="system-selection">
+						<select
+							onChange={(a) => {
+								data.currentSystemName = a.target.value.toLowerCase();
+							}}
+						>
+							{Object.keys(systems).map((systemName) => <option key={systemName}>{systemName}</option>)}
+						</select>
+					</div>
+
+					<div className="results">
+						<button onClick={() => (this.showResults = !this.showResults)}>
+							{this.showResults ? 'Hide' : 'Show'} Calculations
+						</button>
+						<div className="results-table" style={{ display: this.showResults ? 'block' : 'none' }}>
+							<table>
+								<thead>
+									<tr>
+										<th>Angle</th>
+										<th>Normal range</th>
+										<th>Value</th>
+									</tr>
+								</thead>
+								<tbody>
+									{data.angles.map((angle) => {
+										return (
+											<tr key={angle.description}>
+												<td>{angle.description}</td>
+												<td>
+													{angle.normal}±{angle.deviation}
+												</td>
+												<td>{angle.value}</td>
+											</tr>
+										);
+									})}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</main>
+		);
+	}
+
+	componentDidMount() {
+		data.innerWidth = window.innerWidth;
+		data.innerHeight = window.innerHeight;
+		window.addEventListener('resize', () => {
+			data.innerWidth = window.innerWidth;
+			data.innerHeight = window.innerHeight;
+		});
+	}
 }

@@ -35,6 +35,7 @@
 		"prod": "bash scripts/build-production.sh",
 		"lint": "bash scripts/lint.sh",
 		"serve": "bash scripts/serve.sh",
-		"dev": "bash scripts/build-development.sh"
+		"dev": "bash scripts/build-development.sh",
+		"surge": "bash scripts/build-production.sh && cd dist && surge"
 	}
 }

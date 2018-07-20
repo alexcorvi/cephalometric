@@ -1,35 +1,10 @@
-import { Literature } from './literature.interface';
+import { System } from './literature.interface';
 
-export const points: { [key: string]: string } = {
-	S: `(sella), the midpoint of the cavity of sella turcica`,
-	N: `(nasion), Most anterior point on frontonasal suture`,
-	A: `the innermost point on the contour of the premaxilla between anterior nasal spine and the incisor tooth`,
-	B: `the innermost point on the contour of the mandible between the incisor tooth and the bony chin`,
-	Pg: `(pogonion), the most anterior point on the contour of the chin`,
-	Me: `(menton), the most inferior point on the mandibular symphysis (i.e., the bottom of the chin)`,
-	Gn: `(gnathion), Point located perpendicular on mandibular symphysis midway between pogonion and menton`,
-	Go: `(gonion), the midpoint of the contour connecting the ramus and body of the mandible`,
-	Isa: 'Incisor superior apex (upper incisor root)',
-	Is: 'Incisor superior (upper incisor tip)',
-	Ii: 'Incisor inferior (lower incisor tip)',
-	Iia: 'Incisor inferior apex (lower incisor root)',
-	OLp: 'Occlusal Line, posterior point, distal tip of the first molar',
-	OLa: 'Occlusal Line, anterior point, distal tip of the first premolar'
-};
+export const points = [ 'S', 'N', 'A', 'B', 'Pg', 'Me', 'Gn', 'Go', 'Isa', 'Is', 'Ii', 'Iia', 'OLp', 'OLa' ];
 
-export const lines: { [key: string]: string } = {
-	'S-N':
-		'(sella–nasion line), This plane is represents the anterior cranial base and is formed by projecting a plane from the sella-nasion line',
-	'OLp-OLa': 'Occlusal line',
-	'Go-Gn':
-		'(mandibular plane), This plane is formed by connecting the point gonion to gnathion at the inferior border of the mandible.',
-	'N-A': 'upper facial inclination',
-	'N-B': 'lower facial inclination',
-	'Iia-Ii': 'lower incisor inclination',
-	'Isa-Is': 'upper incisor inclination'
-};
+export const lines = [ 'S-N', 'OLp-OLa', 'Go-Gn', 'N-A', 'N-B', 'Iia-Ii', 'Isa-Is' ];
 
-export const angles: { [key: string]: { description: string; normal: number; deviation: number } } = {
+export const angularCalculations: { [key: string]: { description: string; normal: number; deviation: number } } = {
 	'S-N^N-A': {
 		description: 'SNA The angle around the center <N> and between the markers <A> and <S>.',
 		normal: 82,
@@ -72,10 +47,10 @@ export const angles: { [key: string]: { description: string; normal: number; dev
 	}
 };
 
-export const steiner: Literature = {
+export const steiner: System = {
 	points,
 	lines,
-	angles
+	angularCalculations
 };
 
 export default steiner;

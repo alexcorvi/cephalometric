@@ -1,5 +1,5 @@
-export interface Literature {
-	points: { [key: string]: string };
-	lines: { [key: string]: string };
-	angles: { [key: string]: { description: string; normal: number; deviation: number } };
+export interface System {
+	points: string[];
+	lines: string[];
+	angularCalculations: { [key: string]: { description: string; normal: number; deviation: number } };
 }
