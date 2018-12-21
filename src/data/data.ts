@@ -1,19 +1,12 @@
-import { observable, computed } from 'mobx';
-import { System } from '../literature/literature.interface';
+import basic from '../literature/analysis/basic';
+import dental from '../literature/analysis/dental';
+import mandibular from '../literature/analysis/mandibular';
+import tweed from '../literature/analysis/tweed';
+import vertical from '../literature/analysis/vertical';
+import { Analysis } from '../literature/analysis/analysis';
+import { computed, observable } from 'mobx';
 import { findIndex } from '../utils';
-
-interface Line {
-	id: string;
-	description: string;
-	distance?: number;
-	left?: number;
-	top?: number;
-	angle?: number;
-	x1?: number;
-	y1?: number;
-	x2?: number;
-	y2?: number;
-}
+import { points } from '../literature/points';
 
 interface ImgSource {
 	source: string;
@@ -21,24 +14,20 @@ interface ImgSource {
 	width: number;
 }
 
-import { points } from '../literature/points';
-import { lines } from '../literature/lines';
-
-import { ricketts } from '../literature/ricketts';
-import { steiner } from '../literature/steiner';
-import { image } from './sample.img';
-
-export const systems: { [K: string]: System } = {
-	ricketts,
-	steiner
+export const AnalysisMethods: { [K: string]: Analysis } = {
+	basic,
+	dental,
+	tweed,
+	vertical,
+	mandibular
 };
 
 class Data {
 	@observable
 	imgSource: ImgSource = {
-		source: image,
-		height: 1818,
-		width: 2272
+		source: '',
+		height: 300,
+		width: 500
 	};
 
 	@observable innerWidth = innerWidth;
@@ -54,74 +43,23 @@ class Data {
 		return { width: screenWidth, height };
 	}
 
-	@observable currentSystemName: string = Object.keys(systems)[0];
+	@observable currentAnalysisName: string = Object.keys(AnalysisMethods)[0];
 
 	@observable pointCoordinates: { [id: string]: { top: number; left: number } | undefined } = {};
 
 	@computed
-	get system() {
-		return systems[this.currentSystemName];
-	}
-
-	@computed
-	get lines(): Line[] {
-		return this.system.lines.map((id) => {
-			const pointAID = id.split('-')[0];
-			const pointBID = id.split('-')[1];
-
-			const pointACoordinates = this.pointCoordinates[pointAID];
-			const pointBCoordinates = this.pointCoordinates[pointBID];
-			const description = lines[id];
-
-			if (!(pointACoordinates && pointBCoordinates)) {
-				return { id, description };
-			}
-
-			const x1 = pointACoordinates.left / 100 * this.dimensions.width + 5;
-			const x2 = pointBCoordinates.left / 100 * this.dimensions.width + 5;
-			const y1 = pointACoordinates.top / 100 * this.dimensions.height + 5;
-			const y2 = pointBCoordinates.top / 100 * this.dimensions.height + 5;
-
-			const distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-			const left = (x1 + x2) / 2 - distance / 2;
-			const top = (y1 + y2) / 2 - 1 / 2;
-			const angle = Math.atan2(y1 - y2, x1 - x2) * (180 / Math.PI);
-
-			return { distance, left, top, angle, x1, y1, x2, y2, id, description };
-		});
-	}
-
-	@computed
-	get angles() {
-		return Object.keys(this.system.angularCalculations).map((angleID) => {
-			const lineAID = angleID.split('^')[0];
-			const lineBID = angleID.split('^')[1];
-
-			const lineAIndex = findIndex(this.lines, (line) => line.id === lineAID);
-			const lineBIndex = findIndex(this.lines, (line) => line.id === lineBID);
-
-			const lineA = this.lines[lineAIndex];
-			const lineB = this.lines[lineBIndex];
-
-			const angleValue = lineA && lineB ? this.calculateAngle(lineA, lineB) : 'NA';
-
-			return {
-				description: this.system.angularCalculations[angleID].description,
-				normal: this.system.angularCalculations[angleID].normal,
-				deviation: this.system.angularCalculations[angleID].deviation,
-				value: angleValue
-			};
-		});
+	get analysisMethod() {
+		return AnalysisMethods[this.currentAnalysisName];
 	}
 
 	@computed
 	get nextPointIndex() {
-		return findIndex(this.system.points, (pointID) => !this.pointCoordinates[pointID]);
+		return findIndex(this.analysisMethod.requiredPoints, (pointID) => !this.pointCoordinates[pointID]);
 	}
 
 	@computed
 	get nextPointID(): string | undefined {
-		return this.system.points[this.nextPointIndex];
+		return this.analysisMethod.requiredPoints[this.nextPointIndex];
 	}
 
 	@computed
@@ -136,17 +74,6 @@ class Data {
 			left,
 			top
 		};
-	}
-
-	calculateAngle(lineA: Line, lineB: Line) {
-		if (!(lineA.angle && lineB.angle)) {
-			return;
-		}
-		let angle = Math.round(Math.abs(lineA.angle - lineB.angle));
-		if (angle > 180) {
-			angle = 180 - angle;
-		}
-		return Math.abs(angle);
 	}
 }
 

@@ -6,3 +6,7 @@ export function findIndex<T>(array: T[], callback: (point: T) => boolean) {
 	}
 	return -1;
 }
+
+export function inRange(input: number, min: number, max: number) {
+	return input >= min && input <= max;
+}

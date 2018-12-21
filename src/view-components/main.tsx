@@ -1,27 +1,22 @@
-import { observer } from 'mobx-react';
 import * as React from 'react';
-import { Tooltip } from 'react-tippy';
-import { observable } from 'mobx';
+import { AnalysisView } from './analysis-view';
 import { data } from '../data/data';
-import { SystemView } from './system';
-
-import rickettsLiterature from '../literature/ricketts';
-import steinerLiterature from '../literature/steiner';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { Tooltip } from 'react-tippy';
 
 @observer
 export class Main extends React.Component {
-	@observable imgSource: undefined | string;
-
 	input: HTMLInputElement | null = null;
 
 	render() {
 		return (
 			<div>
-				{true ? (
-					<SystemView />
+				{data.imgSource.source ? (
+					<AnalysisView />
 				) : (
 					<div className="choose">
-						<p>Please upload your lateral radiograph, or use the sample for demonstration purposes</p>
+						<p>Please upload your cephalometric radiograph, or use the sample for demonstration purposes</p>
 						<input
 							ref={(el) => (this.input = el)}
 							type="file"
@@ -29,7 +24,14 @@ export class Main extends React.Component {
 								if (this.input && this.input.files && this.input.files[0]) {
 									const FR = new FileReader();
 									FR.addEventListener('load', (e) => {
-										this.imgSource = (e.target as any).result;
+										const source = (e.target as any).result;
+										let img = new Image();
+										img.onload = function() {
+											data.imgSource.height = img.height;
+											data.imgSource.width = img.width;
+											data.imgSource.source = source;
+										};
+										img.src = source;
 									});
 									FR.readAsDataURL(this.input.files[0]);
 								}
@@ -37,8 +39,13 @@ export class Main extends React.Component {
 						/>
 						<button
 							onClick={() => {
-								this.imgSource =
-									'http://3d-cdds.com/Portals/_default/Skins/Doris/images/ceph/standard_ceph.PNG';
+								data.imgSource.source = './sample.png';
+								let img = new Image();
+								img.onload = function() {
+									data.imgSource.height = img.height;
+									data.imgSource.width = img.width;
+								};
+								img.src = './sample.png';
 							}}
 						>
 							Use the demo

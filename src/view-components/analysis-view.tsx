@@ -1,30 +1,39 @@
-import { observer } from 'mobx-react';
 import * as React from 'react';
-import { Tooltip } from 'react-tippy';
-import { observable, computed } from 'mobx';
-import { data } from '../data/data';
-import { PointView } from './point';
-import { points } from '../literature/points';
 import Slider from 'rc-slider';
+import { AnalysisMethods } from '../data/data';
+import { computed, observable } from 'mobx';
+import { data } from '../data/data';
 import { image } from '../data/sample.img';
-import { systems } from '../data/data';
+import { observer } from 'mobx-react';
+import { points } from '../literature/points';
+import { PointView } from './point';
+import { Tooltip } from 'react-tippy';
 
 @observer
-export class SystemView extends React.Component {
+export class AnalysisView extends React.Component {
 	div: HTMLDivElement | null = null;
 	@observable invert: number = 0;
 	@observable contrast: number = 100;
 	@observable brightness: number = 100;
 
-	@observable hovered: string = '';
+	@observable hoveredPoint: string = '';
 
 	@observable showControl: string = '';
 
 	@observable showResults: boolean = false;
 
+	@observable markLines: string[] = [];
+
 	@computed
 	get stepDimension() {
-		return (data.innerHeight - data.system.points.length * 24) / data.system.points.length;
+		const calculated =
+			(data.innerHeight - data.analysisMethod.requiredPoints.length * 30) /
+			data.analysisMethod.requiredPoints.length;
+		if (calculated > 40) {
+			return 40;
+		} else {
+			return calculated;
+		}
 	}
 
 	render() {
@@ -45,7 +54,7 @@ export class SystemView extends React.Component {
 					}}
 				>
 					<img
-						src={image}
+						src={data.imgSource.source}
 						style={{
 							width: data.dimensions.width,
 							height: data.dimensions.height,
@@ -89,14 +98,15 @@ export class SystemView extends React.Component {
 						))}
 					</div>
 					<div className="lines">
-						{data.lines.map((line) => (
-							<Tooltip key={line.id} title={'Line ' + line.id + '  ' + line.description} theme="light">
+						{data.analysisMethod.lines.map((line) => (
+							<Tooltip key={line.id} title={'Line ' + line.id + '  ' + line} theme="light">
 								<div
+									id={line.id}
 									style={{
 										padding: 0,
 										margin: 0,
 										height: 1 + 'px',
-										backgroundColor: '#212121',
+										backgroundColor: this.markLines.indexOf(line.id) !== -1 ? 'gold' : '#212121',
 										lineHeight: '1px',
 										position: 'absolute',
 										left: line.left + 'px',
@@ -109,7 +119,7 @@ export class SystemView extends React.Component {
 						))}
 					</div>
 					<div className="steps">
-						{data.system.points.map((pointID) => (
+						{data.analysisMethod.requiredPoints.map((pointID) => (
 							<div
 								style={{
 									height: this.stepDimension + 'px',
@@ -118,12 +128,12 @@ export class SystemView extends React.Component {
 								}}
 								className={`step ${data.pointCoordinates[pointID]
 									? ' done'
-									: data.nextPointID === pointID ? ' current' : ''} ${this.hovered === pointID
+									: data.nextPointID === pointID ? ' current' : ''} ${this.hoveredPoint === pointID
 									? 'hovered'
 									: ''}`}
 								key={pointID}
-								onMouseEnter={() => (this.hovered = pointID)}
-								onMouseLeave={() => (this.hovered = '')}
+								onMouseEnter={() => (this.hoveredPoint = pointID)}
+								onMouseLeave={() => (this.hoveredPoint = '')}
 							>
 								<span className="id">{pointID}</span>
 								<span className="description" style={{ right: this.stepDimension + 20 + 'px' }}>
@@ -206,43 +216,70 @@ export class SystemView extends React.Component {
 						</div>
 					</div>
 
-					<div className="system-selection">
+					<div className="analysis-selection">
 						<select
 							onChange={(a) => {
-								data.currentSystemName = a.target.value.toLowerCase();
+								data.currentAnalysisName = a.target.value.toLowerCase();
 							}}
 						>
-							{Object.keys(systems).map((systemName) => <option key={systemName}>{systemName}</option>)}
+							{Object.keys(AnalysisMethods).map((methodName) => (
+								<option key={methodName} value={methodName}>
+									{AnalysisMethods[methodName].title}
+								</option>
+							))}
 						</select>
 					</div>
 
-					<div className="results">
-						<button onClick={() => (this.showResults = !this.showResults)}>
-							{this.showResults ? 'Hide' : 'Show'} Calculations
+					<div className={'results-container '}>
+						<button
+							className={this.showResults ? 'show' : ''}
+							onClick={() => (this.showResults = !this.showResults)}
+						>
+							{this.showResults ? '◀' : 'Results'}
 						</button>
-						<div className="results-table" style={{ display: this.showResults ? 'block' : 'none' }}>
+						<div className="results" style={{ display: this.showResults ? 'block' : 'none' }}>
 							<table>
 								<thead>
 									<tr>
 										<th>Angle</th>
-										<th>Normal range</th>
-										<th>Value</th>
+										<th>Population mean</th>
+										<th>Your Value</th>
+										<th>Interpretation</th>
 									</tr>
 								</thead>
 								<tbody>
-									{data.angles.map((angle) => {
+									{data.analysisMethod.anglesValues.map((angle) => {
 										return (
-											<tr key={angle.description}>
+											<tr
+												key={angle.description}
+												onMouseEnter={() => {
+													this.markLines = [];
+													angle.id
+														.split('^')
+														.forEach((lineID) => this.markLines.push(lineID));
+												}}
+												onMouseLeave={() => {
+													this.markLines = [];
+												}}
+											>
 												<td>{angle.description}</td>
 												<td>
-													{angle.normal}±{angle.deviation}
+													{angle.mean} ± {angle.deviation}
 												</td>
 												<td>{angle.value}</td>
+												<td>{angle.interpretation}</td>
 											</tr>
 										);
 									})}
 								</tbody>
 							</table>
+							<p>
+								{data.analysisMethod.otherAnalysisResultComment ? (
+									data.analysisMethod.otherAnalysisResultComment
+								) : (
+									''
+								)}
+							</p>
 						</div>
 					</div>
 				</div>

@@ -14,34 +14,49 @@ body {
 	margin: 0 auto;
 }
 
-.results {
-	position: fixed;
-	max-width: 900px;
-	width: 90%;
-	top: 20px;
-	left: 0;
-	right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: center;
-
-	table {
-		margin-top: 30px;
-		width: 100%;
-		text-align: left;
-		border-spacing: 0;
-		th,
-		td {
-			padding: 10px;
-			border-left: 1px solid #e0e0e0;
+.results-container {
+	position: relative;
+	width: 400px;
+	button {
+		z-index: 1;
+		left: 0;
+		position: fixed;
+		top: 45%;
+		height: 30px;
+		border-radius: 0 3px 3px 0;
+		border: none;
+		background: white;
+		&.show {
+			left: 400px;
 		}
-		th {
-			background-color: #e0e0e0;
-			padding: 10px;
-		}
+	}
 
-		td {
-			background-color: #fff;
+	.results {
+		position: fixed;
+		width: 400px;
+		font-size: 12px;
+		background: #fff;
+		height: 100vh;
+		box-shadow: -20px 3px 20px 20px;
+
+		table {
+			width: 100%;
+			text-align: left;
+			border-spacing: 0;
+			border-bottom: 1px solid #e0e0e0;
+			th,
+			td {
+				padding: 10px;
+				border-left: 1px solid #e0e0e0;
+			}
+			th {
+				background-color: #e0e0e0;
+				padding: 10px;
+				font-weight: 100;
+			}
+			td {
+				background-color: #fff;
+			}
 		}
 	}
 }
@@ -50,17 +65,18 @@ body {
 	position: fixed;
 	right: 20px;
 	text-align: center;
-	top: 20px;
+	top: 60px;
 
 	.step {
 		margin-bottom: 10px;
 		background: #fafafa;
 		position: relative;
 		padding: 5px;
+		border-radius: 50%;
 		&.current,
 		&.current .description {
-			background: #2196f3;
-			color: #fff;
+			background: gold;
+			color: #000;
 			border: 1px solid #fff;
 		}
 		&.done,
@@ -122,8 +138,16 @@ body {
 	}
 }
 
-.system-selection {
+.analysis-selection {
 	position: fixed;
 	top: 20px;
-	left: 20px;
+	right: 20px;
+}
+
+.choose {
+	background: #fff;
+	width: 400px;
+	padding: 25px;
+	margin: 100px auto;
+	border-radius: 3px;
 }
