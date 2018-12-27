@@ -10,25 +10,79 @@ body {
 	display: block !important;
 }
 
+img {
+	cursor: pointer;
+}
+
+.landmark {
+	z-index: 1;
+	line-height: 60px;
+	overflow: visible;
+	font-size: 30px;
+	font-family: monospace;
+	color: rgb(255, 255, 255);
+	text-shadow: rgb(0, 0, 0) 0px 0px 5px;
+	background: #fff;
+	border: 1px solid #212121;
+	width: 10px;
+	height: 10px;
+	border-radius: 5px;
+	position: absolute;
+}
+
+.distance {
+	border-top: 2px dashed #000;
+	background-color: transparent !important;
+}
+
 .container {
 	margin: 0 auto;
+	overflow: hidden;
 }
 
 .results-container {
-	position: relative;
+	position: absolute;
 	width: 400px;
+	z-index: 2;
+	top: 0;
+
 	button {
+		text-align: left;
 		z-index: 1;
 		left: 0;
 		position: fixed;
-		top: 45%;
+		top: 150px;
 		height: 30px;
 		border-radius: 0 3px 3px 0;
 		border: none;
 		background: white;
+		min-width: 110.55px;
+		cursor: pointer;
+		box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
 		&.show {
 			left: 400px;
 		}
+
+		&:hover {
+			background: #81d4fa;
+		}
+
+		&.export-table {
+			left: 400px;
+			top: 200px;
+		}
+
+		&.export-image {
+			z-index: 0;
+			top: 100px;
+		}
+
+		&.export-project {
+			z-index: 0;
+			top: 50px;
+		}
+
 	}
 
 	.results {
@@ -37,6 +91,7 @@ body {
 		font-size: 12px;
 		background: #fff;
 		height: 100vh;
+		overflow-y: auto;
 		box-shadow: -20px 3px 20px 20px;
 
 		table {
@@ -44,16 +99,19 @@ body {
 			text-align: left;
 			border-spacing: 0;
 			border-bottom: 1px solid #e0e0e0;
+
 			th,
 			td {
 				padding: 10px;
 				border-left: 1px solid #e0e0e0;
 			}
+
 			th {
 				background-color: #e0e0e0;
 				padding: 10px;
 				font-weight: 100;
 			}
+
 			td {
 				background-color: #fff;
 			}
@@ -73,21 +131,25 @@ body {
 		position: relative;
 		padding: 5px;
 		border-radius: 50%;
+
 		&.current,
 		&.current .description {
 			background: gold;
 			color: #000;
 			border: 1px solid #fff;
 		}
+
 		&.done,
 		&.done .description {
 			background: #424242;
 			border: 1px solid;
 			color: #fff;
 		}
+
 		&.hovered .description {
 			display: block;
 		}
+
 		.description {
 			position: absolute;
 			width: 300px;
@@ -103,22 +165,28 @@ body {
 }
 
 .controls {
+	z-index: 2;
 	position: fixed;
 	bottom: 20px;
+
 	.control-button {
 		background: #fff;
 		cursor: pointer;
 		position: relative;
+
 		&:hover {
 			background: #212121;
 			color: #fff;
 		}
+
 		&:nth-child(1) {
 			border-radius: 0 4px 0 0;
 		}
+
 		&:nth-child(2) {
 			border-radius: 0;
 		}
+
 		&:nth-child(3) {
 			border-radius: 0 0 4px 0;
 		}
@@ -150,4 +218,33 @@ body {
 	padding: 25px;
 	margin: 100px auto;
 	border-radius: 3px;
+}
+
+.rc-slider-track {
+	background-color: #000 !important;
+}
+
+.additional-comment {
+	padding: 15px;
+	background: #e0e0e0;
+	margin-top: 0;
+}
+
+.cursor-line {
+
+	position: fixed;
+	z-index: 1;
+	border-top: 1px dotted rgba(0, 0, 0, 0.5);
+	border-right: 1px dotted rgba(0, 0, 0, 0.5);
+
+	&.horizontal {
+		width: 100%;
+		height: 1px;
+	}
+
+	&.vertical {
+		width: 1px;
+		height: 100%;
+	}
+
 }

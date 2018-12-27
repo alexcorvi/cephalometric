@@ -3,7 +3,6 @@ import { AnalysisView } from './analysis-view';
 import { data } from '../data/data';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { Tooltip } from 'react-tippy';
 
 @observer
 export class Main extends React.Component {
@@ -24,14 +23,25 @@ export class Main extends React.Component {
 								if (this.input && this.input.files && this.input.files[0]) {
 									const FR = new FileReader();
 									FR.addEventListener('load', (e) => {
-										const source = (e.target as any).result;
-										let img = new Image();
-										img.onload = function() {
-											data.imgSource.height = img.height;
-											data.imgSource.width = img.width;
-											data.imgSource.source = source;
-										};
-										img.src = source;
+										const fileContents = (e.target as any).result;
+										const cephalometricProjectFile = atob(fileContents.split(',')[1]);
+										if (cephalometricProjectFile.startsWith('cephalometric_project:')) {
+											const contents = cephalometricProjectFile.split(
+												'cephalometric_project:'
+											)[1];
+											const fileData: typeof data = JSON.parse(atob(contents));
+											data.imgSource = fileData.imgSource;
+											data.pointCoordinates = fileData.pointCoordinates;
+											data.currentAnalysisName = fileData.currentAnalysisName;
+										} else {
+											const img = new Image();
+											img.onload = function() {
+												data.imgSource.height = img.height;
+												data.imgSource.width = img.width;
+												data.imgSource.source = fileContents;
+											};
+											img.src = fileContents;
+										}
 									});
 									FR.readAsDataURL(this.input.files[0]);
 								}
@@ -40,7 +50,7 @@ export class Main extends React.Component {
 						<button
 							onClick={() => {
 								data.imgSource.source = './sample.png';
-								let img = new Image();
+								const img = new Image();
 								img.onload = function() {
 									data.imgSource.height = img.height;
 									data.imgSource.width = img.width;

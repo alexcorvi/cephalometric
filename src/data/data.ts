@@ -1,8 +1,12 @@
 import basic from '../literature/analysis/basic';
 import dental from '../literature/analysis/dental';
+import downs from '../literature/analysis/downs';
+import eastman from '../literature/analysis/eastman';
 import mandibular from '../literature/analysis/mandibular';
+import steiner from '../literature/analysis/steiner';
 import tweed from '../literature/analysis/tweed';
 import vertical from '../literature/analysis/vertical';
+import wits from '../literature/analysis/wits';
 import { Analysis } from '../literature/analysis/analysis';
 import { computed, observable } from 'mobx';
 import { findIndex } from '../utils';
@@ -17,9 +21,13 @@ interface ImgSource {
 export const AnalysisMethods: { [K: string]: Analysis } = {
 	basic,
 	dental,
-	tweed,
 	vertical,
-	mandibular
+	mandibular,
+	downs,
+	steiner,
+	eastman,
+	wits,
+	tweed
 };
 
 class Data {
@@ -33,6 +41,10 @@ class Data {
 	@observable innerWidth = innerWidth;
 	@observable innerHeight = innerHeight;
 
+	@observable currentAnalysisName: string = Object.keys(AnalysisMethods)[0];
+
+	@observable pointCoordinates: { [id: string]: { top: number; left: number } | undefined } = {};
+
 	@computed
 	get dimensions() {
 		const screenWidth = this.innerWidth;
@@ -42,10 +54,6 @@ class Data {
 		const height = this.imgSource.height - differenceProportion * this.imgSource.height;
 		return { width: screenWidth, height };
 	}
-
-	@observable currentAnalysisName: string = Object.keys(AnalysisMethods)[0];
-
-	@observable pointCoordinates: { [id: string]: { top: number; left: number } | undefined } = {};
 
 	@computed
 	get analysisMethod() {

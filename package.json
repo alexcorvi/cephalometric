@@ -2,7 +2,13 @@
 	"name": "my-app",
 	"version": "0.1.0",
 	"dependencies": {
+		"@types/file-saver": "^2.0.0",
+		"@types/html2canvas": "^0.0.35",
+		"@types/jspdf": "^1.2.2",
 		"@types/rc-slider": "^8.2.3",
+		"file-saver": "^2.0.0",
+		"html2canvas": "^1.0.0-alpha.12",
+		"jspdf": "^1.5.3",
 		"mobx": "^5.0.3",
 		"mobx-react": "^5.2.3",
 		"rc-slider": "^8.6.1",

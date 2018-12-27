@@ -1,6 +1,5 @@
-import { observer } from 'mobx-react';
 import * as React from 'react';
-import { Tooltip } from 'react-tippy';
+import { observer } from 'mobx-react';
 
 @observer
 export class PointView extends React.Component<{
@@ -9,27 +8,23 @@ export class PointView extends React.Component<{
 	top: number;
 	left: number;
 	onDragged: (ev: React.DragEvent<HTMLDivElement>) => void;
+	showNames: boolean;
 }> {
 	render() {
 		return (
-			<Tooltip title={'Point ' + this.props.id + '  ' + this.props.description} theme="light">
-				<div
-					onDragEnd={(ev) => this.props.onDragged(ev)}
-					onDragLeave={(ev) => this.props.onDragged(ev)}
-					id={this.props.id}
-					draggable
-					style={{
-						top: this.props.top + '%',
-						left: this.props.left + '%',
-						background: '#fff',
-						border: '1px solid #212121',
-						width: '10px',
-						height: '10px',
-						borderRadius: 5,
-						position: 'absolute'
-					}}
-				/>
-			</Tooltip>
+			<div
+				className="landmark"
+				onDragEnd={(ev) => this.props.onDragged(ev)}
+				onDragLeave={(ev) => this.props.onDragged(ev)}
+				id={this.props.id}
+				draggable
+				style={{
+					top: this.props.top + '%',
+					left: this.props.left + '%'
+				}}
+			>
+				{this.props.showNames ? this.props.id : ''}
+			</div>
 		);
 	}
 }

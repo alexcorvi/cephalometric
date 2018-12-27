@@ -19,5 +19,18 @@ export const points: { [key: string]: string } = {
 	OLa: 'Occlusal Line, anterior point, distal tip of the first premolar',
 	ANS: 'Anterior nasal spine',
 	PNS: 'Posterior nasal spine',
-	Pog: 'the most anterior point on the bony chin'
+	Pog: 'the most anterior point on the bony chin',
+	'0mm': 'The point at which the ruler starts',
+	'10mm': 'The point at which the ruler reads 10 millimeters',
+	NMP:
+		'A point at the ANS-PNS line that would draw a line where the nasion would meet the ANS-PNS line in a perpendicular way',
+	MMP:
+		'A point at the ANS-PNS line that would draw a line where the menton would meet the ANS-PNS line in a perpendicular way',
+	AOP:
+		'A point at the occlusal plane that would draw a line where point A would meet the occlusal plane in a perpendicular way',
+	BOP:
+		'A point at the occlusal plane that would draw a line where point A would meet the occlusal plane in a perpendicular way',
+	Ms: 'the mesial cusp tip of the maxillary first molar',
+	Mi: 'the mesial cusp tip of the mandibular first molar',
+	EAP: 'A point at the A-Pog line coming from the upper incisor edge'
 };
