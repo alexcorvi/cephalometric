@@ -15,7 +15,10 @@ export class Main extends React.Component {
 					<AnalysisView />
 				) : (
 					<div className="choose">
-						<p>Please upload your cephalometric radiograph, or use the sample for demonstration purposes</p>
+						<p>
+							Please upload your cephalometric radiograph, project file, or use the sample for
+							demonstration purposes
+						</p>
 						<input
 							ref={(el) => (this.input = el)}
 							type="file"
