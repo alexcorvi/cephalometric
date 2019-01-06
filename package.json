@@ -38,6 +38,6 @@
 		"lint": "bash scripts/lint.sh",
 		"serve": "bash scripts/serve.sh",
 		"dev": "bash scripts/build-development.sh",
-		"surge": "bash scripts/build-production.sh && cd dist && surge"
+		"deploy": "bash scripts/build-production.sh && cd dist && surge"
 	}
 }
