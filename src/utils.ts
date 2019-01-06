@@ -1,7 +1,6 @@
-import * as html2canvas from 'html2canvas';
-import * as jsPDF from 'jspdf';
-import { data } from './data/data';
-import { saveAs as save } from 'file-saver';
+import * as html2canvas from "html2canvas";
+import { data } from "./data/data";
+import { saveAs as save } from "file-saver";
 
 export function findIndex<T>(array: T[], callback: (point: T) => boolean) {
 	for (let index = 0; index < array.length; index++) {
@@ -19,9 +18,11 @@ export function inRange(input: number, min: number, max: number) {
 function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 	return new Promise((resolve, reject) => {
 		try {
-			canvas.toBlob((blob) => {
+			canvas.toBlob(blob => {
 				if (!blob) {
-					return reject(new Error('Could not convert canvas to blob'));
+					return reject(
+						new Error("Could not convert canvas to blob")
+					);
 				}
 				return resolve(blob);
 			});
@@ -37,10 +38,12 @@ function blobToBase64(blob: Blob): Promise<string> {
 			const reader = new FileReader();
 			reader.readAsDataURL(blob);
 			reader.onloadend = function() {
-				if (typeof reader.result === 'string') {
+				if (typeof reader.result === "string") {
 					return resolve(reader.result);
 				} else {
-					return reject(new Error('Could not convert blob to base64'));
+					return reject(
+						new Error("Could not convert blob to base64")
+					);
 				}
 			};
 		} catch (e) {
@@ -52,7 +55,7 @@ function blobToBase64(blob: Blob): Promise<string> {
 export async function divToBase64(querySelector: string) {
 	const el: HTMLElement | null = document.querySelector(querySelector);
 	if (!el) {
-		return '';
+		return "";
 	}
 	const canvas = await html2canvas(el);
 	const blob = await canvasToBlob(canvas);
@@ -66,7 +69,19 @@ export function saveAs(base64: string, fileName: string) {
 
 export async function exportDiv(querySelector: string, name: string) {
 	const base64 = await divToBase64(querySelector);
-	saveAs(base64, name + '.png');
+	saveAs(base64, name + ".png");
+}
+
+export function saveToPatient() {
+	top.postMessage(
+		"cephalometric-save:" +
+			JSON.stringify({
+				imgSource: data.imgSource,
+				currentAnalysisName: data.currentAnalysisName,
+				pointCoordinates: data.pointCoordinates
+			}),
+		"*"
+	);
 }
 
 export function export2Base64() {
@@ -78,7 +93,9 @@ export function export2Base64() {
 		})
 	);
 
-	const file = new Blob([ 'cephalometric_project:' + dataToSave ], { type: 'text/plain' });
-	const fileName = prompt('File name');
+	const file = new Blob(["cephalometric_project:" + dataToSave], {
+		type: "text/plain"
+	});
+	const fileName = prompt("File name");
 	save(file, `${fileName || new Date().toLocaleDateString()}.cephalometric`);
 }
