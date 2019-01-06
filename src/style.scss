@@ -2,8 +2,11 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	background: #000;
+	min-height: 100vh;
 	overflow-x: hidden;
+	background: #e3e3e3;
+	font-family: helvetica;
+	font-size: 14px;
 }
 
 [data-tooltipped] {
@@ -81,6 +84,11 @@ img {
 		&.export-project {
 			z-index: 0;
 			top: 50px;
+		}
+
+		&.save-project {
+			z-index: 0;
+			top: 5px;
 		}
 
 	}
