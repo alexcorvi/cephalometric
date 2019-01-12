@@ -23,7 +23,7 @@ Using this little web application you can upload a lateral cephalogram and do a 
 
 ## Demo
 
-Check out the demo at [http://cephalometric.surge.sh/](http://cephalometric.surge.sh/)
+Check out the demo at [http://cephalometric.apexo.app/](http://cephalometric.apexo.app/)
 
 ## Limitations
 
